@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fact or Fallacy</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+body{margin:0}
+
+/* Layout: one narrow column; a strip of the five Hebrew book titles heads the page with this unit's books lit; tekhelet blue (the thread of Num 15:38) is the only accent. */
+:root{
+  --bg:#EDF0EF; --surface:#F8FAF9; --ink:#15232B; --muted:#55656D; --line:#C9D3D6;
+  --accent:#1D4E75; --accent-ink:#FFFFFF;
+  --good:#1E6B45; --good-bg:#DCEFE4; --bad:#A8382F; --bad-bg:#F6DEDA;
+  --display:"Frank Ruhl Libre","Times New Roman",serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E181E; --surface:#16242C; --ink:#E5EDF0; --muted:#93A5AD; --line:#2B3E48;
+  --accent:#7DB3E0; --accent-ink:#0E181E;
+  --good:#5CC08A; --good-bg:#173A29; --bad:#F08A80; --bad-bg:#3F1D1A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E181E; --surface:#16242C; --ink:#E5EDF0; --muted:#93A5AD; --line:#2B3E48;
+  --accent:#7DB3E0; --accent-ink:#0E181E;
+  --good:#5CC08A; --good-bg:#173A29; --bad:#F08A80; --bad-bg:#3F1D1A; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:20px;min-width:0}
+.stack{display:flex;flex-direction:column;gap:16px;min-width:0}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+header{display:flex;flex-direction:column;gap:6px;border-bottom:1px solid var(--line);padding-bottom:16px}
+.books{display:flex;flex-wrap:wrap;gap:4px 18px;font-family:var(--display);font-size:1.15rem;direction:ltr}
+.books span{direction:rtl;unicode-bidi:isolate;color:var(--muted);opacity:.55}
+.books span.on{color:var(--accent);opacity:1;font-weight:700}
+.label{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-family:var(--display);font-weight:700;font-size:2.1rem;line-height:1.1;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:0;font-size:.95rem}
+.lead{margin:0;font-size:1.02rem;max-width:62ch}
+
+ol.rounds{margin:0;padding:0;list-style:none;counter-reset:r;border-top:1px solid var(--line)}
+ol.rounds li{counter-increment:r;display:grid;grid-template-columns:2rem 1fr;gap:0 4px;padding:12px 4px;border-bottom:1px solid var(--line)}
+ol.rounds li::before{content:counter(r);grid-row:span 2;font-family:var(--display);font-size:1.4rem;color:var(--accent);font-variant-numeric:tabular-nums}
+ol.rounds strong{font-weight:600}
+ol.rounds span{color:var(--muted);font-size:.9rem}
+
+.bar{display:flex;justify-content:space-between;gap:12px;font-size:.9rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.track{height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.track i{display:block;height:100%;background:var(--accent);transition:width .25s}
+
+.q{font-family:var(--display);font-size:1.4rem;line-height:1.3;margin:0;text-wrap:balance}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opts.two{flex-direction:row}
+.opts.two .opt{flex:1;text-align:center;font-weight:600}
+.opt{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 16px;width:100%}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:disabled{cursor:default}
+.opt.good{background:var(--good-bg);border-color:var(--good)}
+.opt.bad{background:var(--bad-bg);border-color:var(--bad)}
+.fb{border-left:3px solid var(--accent);padding:4px 0 4px 14px;display:flex;flex-direction:column;gap:2px}
+.fb strong{font-weight:600}
+.fb .ref{color:var(--muted);font-size:.85rem}
+.primary{background:var(--accent);color:var(--accent-ink);border:0;border-radius:6px;padding:12px 22px;font-weight:600;align-self:flex-start}
+.primary:disabled{opacity:.4;cursor:not-allowed}
+.ghost{background:none;border:1px solid var(--accent);color:var(--accent);border-radius:6px;padding:11px 20px;font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.besttxt{color:var(--muted);font-size:.9rem}
+
+.pairs{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+.pairs .col{display:flex;flex-direction:column;gap:10px;min-width:0}
+.tile{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px;font-size:.92rem;min-width:0;overflow-wrap:anywhere}
+.tile.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.tile.done{background:var(--good-bg);border-color:var(--good);cursor:default}
+.tile.wrong{background:var(--bad-bg);border-color:var(--bad)}
+
+.tray{display:flex;flex-wrap:wrap;gap:8px}
+.item{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:.92rem;max-width:100%;overflow-wrap:anywhere}
+.item.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.targets{display:grid;gap:10px}
+.targets.view-buckets{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.targets.view-blanks{grid-template-columns:1fr}
+.targets.view-frame{grid-template-columns:1fr;justify-items:center}
+.targets.view-plan{border:2px solid var(--accent);border-radius:4px;padding:8px;gap:6px}
+.tg{background:var(--surface);border:1px dashed var(--line);border-radius:6px;padding:10px 12px;text-align:left;width:100%;min-width:0;display:flex;flex-direction:column;gap:4px}
+.tg:hover:not(:disabled){border-color:var(--accent)}
+.tg:disabled{cursor:default}
+.tg.full{border-style:solid;border-color:var(--good)}
+.tg.bad{background:var(--bad-bg);border-color:var(--bad);border-style:solid}
+.tg .tl{font-weight:600}
+.tg .ts{color:var(--muted);font-size:.82rem}
+.put{display:block;font-size:.88rem;padding:6px 8px;background:var(--good-bg);border:1px solid var(--good);border-radius:4px}
+.blank{display:inline-block;min-width:5.5em;border-bottom:2px solid var(--accent);text-align:center;font-weight:600;color:var(--good)}
+.tg.zone-tent{border-color:var(--accent)}
+.edge{color:var(--muted);font-size:.8rem;text-align:center;letter-spacing:.06em;text-transform:uppercase}
+
+.result{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line);padding-top:20px}
+.big{font-family:var(--display);font-size:3rem;line-height:1;font-variant-numeric:tabular-nums;color:var(--accent)}
+table.res{border-collapse:collapse;width:100%;font-size:.92rem;font-variant-numeric:tabular-nums}
+table.res td{padding:8px 4px;border-bottom:1px solid var(--line)}
+table.res td:last-child{text-align:right;font-weight:600}
+@media (prefers-reduced-motion:reduce){.track i{transition:none}}
+@media (max-width:420px){h1{font-size:1.75rem}.q{font-size:1.2rem}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="books" id="books" aria-label="The five books of the Pentateuch in Hebrew"></div>
+    <div class="label" id="eyebrow"></div>
+    <h1 id="gtitle"></h1>
+    <p class="sub" id="gsub"></p>
+  </header>
+  <main id="app"></main>
+</div>
+
+<script>
+var GAME={"key": "u1", "title": "Fact or Fallacy", "eyebrow": "Introduction to the Pentateuch · Unit I · Lessons 1–2", "tagline": "What the Torah is, why it matters, and who wrote it.", "books": [0, 1, 2, 3, 4], "intro": "Review Lessons 1 and 2: the name and place of the Pentateuch, its theme, and the debate over authorship. Each answer you get right on the first try scores a point.", "rounds": [{"type": "choose", "kind": "tf", "n": 8, "name": "Fact or fallacy", "blurb": "Judge eight statements true or false.", "items": [{"q": "Torah means “law” and nothing more.", "a": false, "e": "Torah means “instruction.” Law is only part of it, and the books are essentially narrative with episodes of law-giving.", "r": "Lesson 1, Section 1.1"}, {"q": "“Pentateuch” comes from Greek words meaning “five” and “scroll or case.”", "a": true, "e": "Penta is five and teuchos is a case or container for scrolls, so the Pentateuch is the five-scroll work.", "r": "Lesson 1, Section 1.1"}, {"q": "In the Hebrew canon the Torah is followed by the Nebi’im (Prophets) and the Kethubim (Writings).", "a": true, "e": "The Torah stands first, and everything after it is written in its shadow.", "r": "Lesson 1, Section 1.1"}, {"q": "The prophets apply the covenant curses of Leviticus 26 and Deuteronomy 28–29 to a disobedient Israel.", "a": true, "e": "They act as covenant enforcers. Compare Deut 28:22 with Amos 4:9 and Hag 2:17.", "r": "Lesson 1, Table 1.2"}, {"q": "Posterity dominates Exodus and Leviticus, and relationship dominates Genesis 12–50.", "a": false, "e": "It is the other way round: posterity in Genesis 12–50, relationship in Exodus and Leviticus, land in Numbers and Deuteronomy.", "r": "Lesson 1, Section 1.3"}, {"q": "The Pentateuch names Moses as the author of all five books.", "a": false, "e": "The text is anonymous. It credits Moses with writing particular things: records, laws and a poem.", "r": "Lesson 2, Section 2.1"}, {"q": "Brevard Childs suggests Mosaic authorship mattered partly because it supported the historicity of the account and Moses’ role as mediator.", "a": true, "e": "He also notes that authoritative laws were attributed to Moses, and laws attributed to Moses were authoritative.", "r": "Lesson 2, Section 2.1"}, {"q": "In the Documentary Hypothesis the Priestly source (P) is usually regarded as the earliest.", "a": false, "e": "P is usually regarded as the latest source, from post-exilic priests c. 500–450 B.C.", "r": "Lesson 2, Table 2.4"}, {"q": "Recent scholarship has moved away from dividing sources toward the final form of the text.", "a": true, "e": "For the church the decisive point is that the final form is what has been received as canon.", "r": "Lesson 2, Section 2.3"}, {"q": "A Tetrateuch view treats Genesis to Joshua as one literary unit.", "a": false, "e": "That is the Hexateuch (von Rad). The Tetrateuch (Noth) treats Genesis to Numbers as a unit.", "r": "Lesson 2, Section 2.3"}, {"q": "Blenkinsopp’s outline places Leviticus at the centre of the five books.", "a": true, "e": "Genesis–Exodus bring Israel to Sinai, Leviticus tells it how to live in God’s presence, and Numbers–Deuteronomy send it toward the land.", "r": "Lesson 1, Section 1.3"}, {"q": "Clines states the theme as the partial fulfilment of the promise to the patriarchs.", "a": true, "e": "The promise has three elements: posterity, a divine–human relationship and land.", "r": "Lesson 1, Section 1.3"}]}, {"type": "match", "name": "Books and keywords", "blurb": "Match each book to Jensen’s keyword.", "pairs": [{"a": "Genesis", "b": "Beginnings"}, {"a": "Exodus", "b": "Deliverance"}, {"a": "Leviticus", "b": "Legislation"}, {"a": "Numbers", "b": "Testing"}, {"a": "Deuteronomy", "b": "Preparation"}]}, {"type": "assign", "view": "buckets", "name": "Source sorter", "blurb": "Sort each clue under the source it describes.", "targets": [{"id": "J", "label": "J", "sub": "Yahwist"}, {"id": "E", "label": "E", "sub": "Elohist"}, {"id": "D", "label": "D", "sub": "Deuteronomist"}, {"id": "P", "label": "P", "sub": "Priestly"}], "items": [{"x": "Judean author, 9th century B.C.; uses “Yahweh”", "t": "J", "n": "The Yahwist begins at Gen 2:4b and highlights patriarchal faith."}, {"x": "Uses “Sinai”; the natives are “Canaanites”", "t": "J", "n": "A mark of J in Table 2.5."}, {"x": "Northern kingdom author, 8th century B.C.", "t": "E", "n": "E emphasises Jacob, Joseph and northern tribes such as Ephraim."}, {"x": "Uses “Horeb”; the natives are “Amorites”", "t": "E", "n": "A mark of E in Table 2.5."}, {"x": "Sermonic style with long homiletic speeches", "t": "D", "n": "D is dominant in Deuteronomy, with covenant-legal vocabulary."}, {"x": "A school active in Josiah’s reign, c. 630–600 B.C.", "t": "D", "n": "D is also linked to the final edition of the Former Prophets."}, {"x": "Post-exilic priests, c. 500–450 B.C.; usually the latest source", "t": "P", "n": "P is usually regarded as the latest source."}, {"x": "Lists, genealogies and stock phrases such as “these are the generations”", "t": "P", "n": "P is orderly in style: liturgy, genealogies, statistics and laws."}, {"x": "The only source of Exodus 25–31, 35–40 and Leviticus", "t": "P", "n": "Table 2.4 gives P all of Leviticus."}]}, {"type": "match", "name": "Scholars and ideas", "blurb": "Link each scholar to the idea you met in the lessons.", "pairs": [{"a": "Clines", "b": "The theme is the partial fulfilment of the promise to the patriarchs"}, {"a": "Blenkinsopp", "b": "Places Leviticus at the centre of the five books"}, {"a": "Geddes", "b": "Fragmentary theory: an unknown redactor assembled many fragments"}, {"a": "Von Rad", "b": "Hexateuch: Genesis–Joshua as one literary unit"}, {"a": "Noth", "b": "Tetrateuch: Genesis–Numbers as one literary unit"}, {"a": "Longman and Dillard", "b": "The final form is what God has given the church as canon"}]}]};
+(function(){
+var G=GAME,app=document.getElementById('app'),S=null;
+var HEB=['בראשית','שמות','ויקרא','במדבר','דברים'];
+document.getElementById('books').innerHTML=HEB.map(function(h,i){return '<span lang="he"'+(G.books.indexOf(i)>=0?' class="on"':'')+'>'+h+'</span>'}).join('');
+document.getElementById('eyebrow').textContent=G.eyebrow;
+document.getElementById('gtitle').textContent=G.title;
+document.getElementById('gsub').textContent=G.tagline;
+
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+var store={
+  get:function(k){try{return JSON.parse(localStorage.getItem('pc-'+G.key+'-'+k))}catch(e){return null}},
+  set:function(k,v){try{localStorage.setItem('pc-'+G.key+'-'+k,JSON.stringify(v))}catch(e){}}
+};
+function show(h){app.innerHTML=h;window.scrollTo(0,0)}
+function bar(label){var n=G.rounds.length;return '<div class="bar"><span>'+esc(label)+'</span><span>'+S.hits+' first try</span></div><div class="track"><i style="width:'+(S.r/n*100)+'%"></i></div>'}
+function head(){var R=G.rounds[S.r];return bar('Round '+(S.r+1)+' of '+G.rounds.length+' · '+R.name)}
+
+function intro(){
+  var best=store.get('best');
+  show('<div class="stack"><p class="lead">'+esc(G.intro)+'</p><ol class="rounds">'+
+    G.rounds.map(function(r){return '<li><strong>'+esc(r.name)+'</strong><span>'+esc(r.blurb)+'</span></li>'}).join('')+
+    '</ol><div class="row"><button class="primary" id="go">Start</button>'+(best!==null?'<span class="besttxt">Best score: '+best+'%</span>':'')+'</div></div>');
+  document.getElementById('go').onclick=start;
+}
+function start(){S={r:0,hits:0,total:0,res:[]};run()}
+function run(){
+  var R=G.rounds[S.r];
+  if(R.type==='choose')runChoose(R);else if(R.type==='match')runMatch(R);else runAssign(R);
+}
+function done(hits,total){
+  var R=G.rounds[S.r];
+  hits=Math.max(0,Math.min(total,hits));
+  S.res.push({name:R.name,hits:hits,total:total});S.hits+=hits;S.total+=total;S.r++;
+  if(S.r>=G.rounds.length)return finish();
+  var nx=G.rounds[S.r];
+  show('<div class="stack">'+bar('Round '+S.r+' of '+G.rounds.length+' complete')+'<div class="result"><div class="label">'+esc(R.name)+'</div><div class="big">'+hits+' / '+total+'</div><p style="margin:0">right on the first try.</p><button class="primary" id="next">Next: '+esc(nx.name)+'</button></div></div>');
+  document.getElementById('next').onclick=run;
+}
+function finish(){
+  var pct=S.total?Math.round(S.hits/S.total*100):0;
+  var prev=store.get('best');if(prev===null||pct>prev)store.set('best',pct);
+  var msg=pct===100?'A perfect run.':pct>=80?'Strong grasp of this unit.':pct>=60?'A good base. Reread the sections behind the ones you missed.':'Go back through the lessons, then try again.';
+  show('<div class="stack"><div class="track"><i style="width:100%"></i></div><div class="result"><div class="label">Game complete</div><div class="big">'+pct+'%</div><p style="margin:0">'+S.hits+' of '+S.total+' right on the first try. '+msg+'</p>'+
+    '<table class="res">'+S.res.map(function(r){return '<tr><td>'+esc(r.name)+'</td><td>'+r.hits+' / '+r.total+'</td></tr>'}).join('')+'</table>'+
+    '<div class="row"><button class="primary" id="again">Play again</button></div></div></div>');
+  document.getElementById('again').onclick=start;
+}
+
+/* ---- choose: true/false or multiple choice ---- */
+function runChoose(R){
+  var pool=shuffle(R.items);if(R.n)pool=pool.slice(0,R.n);
+  var qs=pool.map(function(x){
+    var o;
+    if(R.kind==='tf')o=[{t:'True',ok:x.a===true},{t:'False',ok:x.a===false}];
+    else if(R.options)o=R.options.map(function(t,i){return {t:t,ok:i===x.a}});
+    else o=shuffle(x.o.map(function(t,i){return {t:t,ok:i===0}}));
+    return {q:x.q,e:x.e,r:x.r,o:o};
+  });
+  var i=0,hits=0;
+  function step(){
+    var q=qs[i],n=qs.length,last=i===n-1,answered=false;
+    show('<div class="stack">'+head()+'<div class="label">'+(R.kind==='tf'?'True or false':'Question')+' '+(i+1)+' of '+n+'</div><p class="q">'+esc(q.q)+'</p><div class="opts'+(R.kind==='tf'?' two':'')+'" id="opts">'+
+      q.o.map(function(o,j){return '<button class="opt" data-j="'+j+'">'+esc(o.t)+'</button>'}).join('')+'</div><div id="fb"></div></div>');
+    var btns=app.querySelectorAll('.opt');
+    btns.forEach(function(b){b.onclick=function(){
+      if(answered)return;answered=true;
+      var j=+b.getAttribute('data-j'),ok=q.o[j].ok;if(ok)hits++;
+      btns.forEach(function(x,k){x.disabled=true;if(q.o[k].ok)x.classList.add('good');else if(k===j)x.classList.add('bad')});
+      document.getElementById('fb').innerHTML='<div class="stack"><div class="fb"><strong>'+(ok?'Correct.':'Not quite.')+'</strong><span>'+esc(q.e)+'</span><span class="ref">'+esc(q.r)+'</span></div><button class="primary" id="nx">'+(last?'Finish round':'Next')+'</button></div>';
+      var nx=document.getElementById('nx');nx.focus();
+      nx.onclick=function(){if(last)done(hits,n);else{i++;step()}};
+    }});
+  }
+  step();
+}
+
+/* ---- match: tap left, then its partner on the right ---- */
+function runMatch(R){
+  var total=R.pairs.length;
+  var left=shuffle(R.pairs.map(function(p,i){return {id:i,t:p.a}})),right=shuffle(R.pairs.map(function(p,i){return {id:i,t:p.b}}));
+  var s={sel:null,done:{},mist:0,lock:false,wl:null,wr:null};
+  function draw(){
+    var found=Object.keys(s.done).length;
+    show('<div class="stack">'+head()+'<p class="sub" style="margin:0">'+esc(R.blurb)+' Tap one on the left, then its partner on the right.</p>'+
+     '<div class="bar"><span>'+found+' of '+total+' matched</span><span>'+s.mist+' miss'+(s.mist===1?'':'es')+'</span></div>'+
+     '<div class="pairs"><div class="col">'+left.map(function(x){
+        var c='tile'+(s.done[x.id]?' done':'')+(s.sel===x.id?' sel':'')+(s.wl===x.id?' wrong':'');
+        return '<button class="'+c+'" data-l="'+x.id+'"'+(s.done[x.id]?' disabled':'')+'>'+esc(x.t)+'</button>'}).join('')+'</div><div class="col">'+
+      right.map(function(x){
+        var c='tile'+(s.done[x.id]?' done':'')+(s.wr===x.id?' wrong':'');
+        return '<button class="'+c+'" data-r="'+x.id+'"'+(s.done[x.id]?' disabled':'')+'>'+esc(x.t)+'</button>'}).join('')+'</div></div></div>');
+    app.querySelectorAll('[data-l]').forEach(function(b){b.onclick=function(){if(s.lock)return;s.sel=+b.getAttribute('data-l');draw()}});
+    app.querySelectorAll('[data-r]').forEach(function(b){b.onclick=function(){
+      if(s.lock||s.sel===null)return;
+      var r=+b.getAttribute('data-r');
+      if(r===s.sel){s.done[r]=true;s.sel=null;if(Object.keys(s.done).length===total)done(total-s.mist,total);else draw()}
+      else{s.mist++;s.lock=true;s.wl=s.sel;s.wr=r;draw();setTimeout(function(){s.lock=false;s.wl=s.wr=null;s.sel=null;draw()},700)}
+    }});
+  }
+  draw();
+}
+
+/* ---- assign: pick a card, tap where it belongs ---- */
+function runAssign(R){
+  var cap=R.view==='buckets'?9999:1,total=R.items.length;
+  var items=shuffle(R.items.map(function(x,i){return {id:i,t:x.t,x:x.x,n:x.n}}));
+  var s={sel:null,placed:{},inT:{},miss:0,bad:null,note:null,count:0};
+  R.targets.forEach(function(t){s.inT[t.id]=[]});
+  function item(id){return items.filter(function(x){return x.id===id})[0]}
+  function draw(){
+    var rest=items.filter(function(x){return !s.placed[x.id]});
+    var areas=R.view==='plan'?' style="grid-template-areas:'+R.areas+'"':'';
+    var html='<div class="stack">'+head()+'<p class="sub" style="margin:0">'+esc(R.blurb)+' Pick a card, then tap where it belongs.</p>'+
+      '<div class="bar"><span>'+s.count+' of '+total+' placed</span><span>'+s.miss+' miss'+(s.miss===1?'':'es')+'</span></div>'+
+      '<div class="tray" id="tray">'+rest.map(function(x){return '<button class="item'+(s.sel===x.id?' sel':'')+'" data-i="'+x.id+'">'+esc(x.x)+'</button>'}).join('')+'</div>';
+    if(R.topLabel)html+='<div class="edge">'+esc(R.topLabel)+'</div>';
+    html+='<div class="targets view-'+R.view+'"'+areas+'>'+R.targets.map(function(t){
+      var put=s.inT[t.id],full=put.length>=cap;
+      var lab=esc(t.label);
+      if(R.view==='blanks')lab=lab.replace('___','<span class="blank">'+(put.length?esc(item(put[0]).x):'&nbsp;')+'</span>');
+      var st=[];if(R.view==='plan')st.push('grid-area:'+t.area);if(R.view==='frame')st.push('width:'+t.w+'%');
+      var cls='tg'+(full?' full':'')+(s.bad===t.id?' bad':'')+(t.zone?' zone-'+t.zone:'');
+      return '<button class="'+cls+'" data-t="'+t.id+'"'+(full?' disabled':'')+(st.length?' style="'+st.join(';')+'"':'')+'><span class="tl">'+lab+'</span>'+(t.sub?'<span class="ts">'+esc(t.sub)+'</span>':'')+
+        (R.view==='blanks'?'':put.map(function(id){return '<span class="put">'+esc(item(id).x)+'</span>'}).join(''))+'</button>'}).join('')+'</div>';
+    if(R.bottomLabel)html+='<div class="edge">'+esc(R.bottomLabel)+'</div>';
+    if(s.note)html+='<div class="fb"><strong>'+esc(s.note.h)+'</strong>'+(s.note.b?'<span>'+esc(s.note.b)+'</span>':'')+'</div>';
+    if(s.count===total)html+='<button class="primary" id="fin">Finish round</button>';
+    html+='</div>';
+    show(html);
+    app.querySelectorAll('[data-i]').forEach(function(b){b.onclick=function(){s.sel=+b.getAttribute('data-i');s.note=null;draw()}});
+    app.querySelectorAll('[data-t]').forEach(function(b){b.onclick=function(){
+      var tid=b.getAttribute('data-t');
+      if(s.sel===null){s.note={h:'Pick a card first.',b:'Then tap the place where it belongs.'};draw();return}
+      var it=item(s.sel);
+      if(String(it.t)===tid){s.placed[it.id]=true;s.inT[tid].push(it.id);s.count++;s.sel=null;s.bad=null;s.note={h:'Correct.',b:it.n||''};draw()}
+      else{s.miss++;s.bad=tid;s.note={h:'Not there.',b:'Try another place.'};draw();setTimeout(function(){s.bad=null;var keep=s.note;draw();},650)}
+    }});
+    var f=document.getElementById('fin');if(f)f.onclick=function(){done(total-s.miss,total)};
+  }
+  draw();
+}
+
+intro();
+})();
+</script>
+</body>
+</html>
