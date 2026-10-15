@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pentateuch Challenge</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;700&family=Public+Sans:wght@400;600&display=swap">
+<style>
+:root{--bg:#EDF0EF;--surface:#F8FAF9;--ink:#15232B;--muted:#55656D;--line:#C9D3D6;--accent:#1D4E75;
+--display:"Frank Ruhl Libre","Times New Roman",serif;--body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#0E181E;--surface:#16242C;--ink:#E5EDF0;--muted:#93A5AD;--line:#2B3E48;--accent:#7DB3E0;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
+padding:24px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.books{display:flex;flex-wrap:wrap;gap:4px 18px;font-family:var(--display);font-size:1.15rem;color:var(--accent)}
+.books span{direction:rtl;unicode-bidi:isolate}
+h1{font-family:var(--display);font-size:2.1rem;line-height:1.1;margin:0}
+p{margin:0;color:var(--muted)}
+header{display:flex;flex-direction:column;gap:6px;border-bottom:1px solid var(--line);padding-bottom:16px}
+a.g{display:flex;justify-content:space-between;align-items:center;gap:16px;text-decoration:none;color:inherit;border-bottom:1px solid var(--line);padding:18px 4px}
+a.g:hover{background:var(--surface)}
+a.g:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+a.g b{display:block;font-family:var(--display);font-size:1.3rem}
+a.g span{color:var(--muted);font-size:.92rem}
+a.g i{font-style:normal;color:var(--accent);font-size:1.4rem}
+nav{border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="books"><span lang="he">בראשית</span><span lang="he">שמות</span><span lang="he">ויקרא</span><span lang="he">במדבר</span><span lang="he">דברים</span></div>
+<h1>Pentateuch Challenge</h1>
+<p>Unit review games for Introduction to the Pentateuch. Choose your unit.</p>
+</header>
+<nav>
+<a class="g" href="unit1-fact-or-fallacy.html"><div><b>Unit I · Fact or Fallacy</b><span>Lessons 1–2: the Torah, its theme and its authorship</span></div><i>›</i></a>
+<a class="g" href="unit2-judgement-and-grace.html"><div><b>Unit II · Judgement and Grace</b><span>Lessons 3–4: Genesis from creation to Abraham</span></div><i>›</i></a>
+<a class="g" href="unit3-tabernacle-builder.html"><div><b>Unit III · Tabernacle Builder</b><span>Lessons 5–6: Exodus and Leviticus</span></div><i>›</i></a>
+<a class="g" href="unit4-wilderness-to-moab.html"><div><b>Unit IV · Wilderness to Moab</b><span>Lessons 7–8: Numbers and Deuteronomy</span></div><i>›</i></a>
+</nav>
+</div>
+</body>
+</html>
